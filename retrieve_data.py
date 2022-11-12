@@ -3,6 +3,7 @@ Class for getting the data from the feed
 """
 import requests
 from feed_processer import Feed_Processor
+import json
 
 
 class Retrieve_Data:
@@ -30,13 +31,13 @@ class Retrieve_Data:
         # Get the data
         data = response.text
         # Check the type of the feed
-        if data[0] == "{" or data[0] == "[":
+        response_type = response.headers["Content-Type"]
+        if "json" in response_type:
             data_type = "json"
-        elif data[0] == "<":
+        elif "xml" in response_type:
             data_type = "xml"
         else:
-            raise ValueError("Error: Invalid feed type!")
+            raise ValueError("Invalid feed type! Only json and xml are supported.")
         # Process the data
         feed_processor = Feed_Processor(data, data_type)
-        feed_dict = feed_processor.data_to_dict()
-        return feed_dict
+        return feed_processor.data_to_dict()
